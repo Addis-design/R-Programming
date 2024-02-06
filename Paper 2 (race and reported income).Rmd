@@ -1,0 +1,378 @@
+---
+title: 'Paper 2 (race and reported income)'
+author: "Clayton Perrin"
+date: "2023-10-16"
+output: pdf_document
+---
+
+**Introduction**
+================
+
+The period from 1970 to 2010 in the United States saw a complex racial and economic segregation evolution. While there were legal advancements in civil rights and a reduction in racial segregation in residential areas during the 1970s and 1980s, persistent inequalities in income and housing remained. In the 1990s and early 2000s, a troubling trend of resegregation in public schools emerged, exacerbated by economic disparities. The Great Recession of 2008 deepened these divisions, particularly among minority communities, and gentrification displaced low-income populations. Wealth inequality also widened along racial and ethnic lines during this time.
+A scholarly document emphasizes the deep-rooted health disparities among different racial and socioeconomic groups, calling for systemic changes to address these inequalities. Race and socioeconomic status impact healthcare access, environmental hazards, and the quality of medical care. The paper advocates for data collection, targeted interventions, and structural reforms to achieve health equity.
+Wealth disparities have grown significantly among white, black, and Hispanic households since the Great Recession. Income gaps, differences in financial asset ownership, and home foreclosures have contributed to this wealth divide, posing barriers to economic mobility for black and Hispanic families.
+Income disparities are also closely linked to race in the United States, with whites and Asians earning more than other racial groups, even when controlling for factors like education and job type. This income gap perpetuates wealth inequality and hinders upward economic mobility, particularly for people from financially disadvantaged backgrounds.
+
+Historical factors such as slavery and Jim Crow laws continue to impact racial and economic disparities, making it challenging for some communities to escape poverty and achieve financial success.
+
+
+
+
+In this paper, we want to investigate theories about the link between two variables at the individual level. Our specific focus is on comprehending the correlation between race  and income at the individual level.
+
+**Variables, Measurement, Hypothesis**
+================
+The goal is to test a hypothesis on abbreviated relationship by assuming that a certain race has higher income level. To begin our exploratory analysis, we use R-script and gss_cat data located in the forcats package. To test our hypothesis , two variables, rincome and race are used.
+
+**Load Libraries**
+================
+```{r}
+library(dplyr)
+library(descr)
+library(forcats)
+library(ggplot2)
+```
+
+
+**View the Data**
+================
+```{r}
+#view the gss_cat documentatio
+gss_cat
+```
+
+
+**Check Categories for Income**
+================
+```{r}
+summary(gss_cat$rincome)
+```
+
+**Check Categories for Race**
+================
+```{r}
+summary(gss_cat$race)
+```
+
+
+
+**Remove Missing Values**
+================
+```{r}
+## create data frame & remove missing values
+df1 <- gss_cat %>% 
+  na.omit() %>% 
+  filter(year == 2010) %>% 
+  select(year, race, rincome)
+```
+
+
+**Create a Table of the Data**
+================
+```{r}
+## create a table of gss_cat
+table(gss_cat$race)
+table(gss_cat$rincome)
+```
+
+**Making variable dichotomous, eliminating categories from data**
+================
+```{r}
+## making variable dichotomous, eliminating categories from data
+df1 %>% 
+  filter(year == 2010) %>% 
+  filter(race != "Other")
+```
+
+
+
+```{r}
+df1 %>% 
+  filter(year == 2010) %>% 
+  filter(rincome  != " Don't know" 
+         & rincome != "Refused" 
+         & rincome  != "Not applicable" )
+```
+
+**Get a quick count of the sample size**
+================
+```{r}
+## get a quick count of the sample size
+count(df1)
+```
+
+**Get the relative frequency for the race variable**
+================S
+```{r}
+## get the relative frequency for the race variable
+df1 %>% 
+  filter(year == 2010) %>% 
+  filter(race != "Other") %>% 
+  count(race) %>% 
+  mutate(prop = prop.table(n))
+```
+
+
+**Get relative frquency for the response variable**
+================
+```{r}
+## get relative frquency for the response variable (income)
+df1 %>% 
+  filter(year == 2010) %>% 
+  filter(rincome != "No answer"
+         & rincome != "Refused"
+         & rincome != "Not applicable"
+         & rincome != "Don't Know" ) %>% 
+  mutate(rincome = fct_recode(rincome, 
+                              "More than 20000" = "$25000 or more",
+                              "More than 20000" = "$20000 - 24999",
+                              "Less than 20000" = "$15000 - 19999",
+                              "Less than 20000" = "$10000 - 14999",
+                              "Less than 20000" = "$8000 to 9999",
+                              "Less than 20000" = "$7000 to 7999",
+                              "Less than 20000" = "$6000 to 6999",
+                              "Less than 20000" = "$5000 to 5999",
+                              "Less than 20000" = "$4000 to 4999",
+                              "Less than 20000" = "$3000 to 3999",
+                              "Less than 20000" = "$1000 to 2999",
+                              "Less than 20000" = "Lt $1000"))   %>% 
+  count(rincome) %>% 
+  mutate(prop = prop.table(n))
+
+```
+
+**Filter and prepare the data for visualization**
+================
+```{r}
+# Filter and prepare the data for visualization
+data_to_plot <- df1 %>%
+  filter(year == 2010) %>%
+  filter(race != "Other" &
+           rincome != "No answer" &
+           rincome != "Refused" &
+           rincome != "Not applicable" &
+           rincome != "Don't Know")
+
+```
+**Including Plots**
+================
+
+**Create a bar plot for race**
+================
+```{r}
+# Create a bar plot for race
+ggplot(df1 %>% 
+         filter(year == 2010) %>% 
+         filter(race != "Other") %>% 
+         count(race) %>% 
+         mutate(prop = prop.table(n)), 
+       aes(x = race, y = prop, fill = race)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Relative Frequency of Race in 2010",
+       x = "Race",
+       y = "Proportion") +
+  theme_minimal()
+```
+
+**Create a grouped bar plot**
+================
+```{r}
+# Create a grouped bar plot
+ggplot(data_to_plot, aes(x = race, fill = rincome)) +
+  geom_bar(position = "dodge") +
+  labs(title = "Income vs Race in 2010",
+       x = "Race",
+       y = "Count") +
+  scale_fill_brewer(palette = "Set1") +  # Adjust the color palette
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotate x-axis labels for better readability
+
+```
+
+**Statistical Analysis - Race vs. Income**
+================
+
+Create Dichotomous Variables
+================
+
+```{r}
+#We create dichotomous variables 'White' and 'Non-White' for race, and 'High Income' and 'Low Income' for income
+df1 <- df1 %>%
+  mutate(Race_Dichotomous = ifelse(race == "White", "White", "Non-White"))
+
+# Create dichotomous variables for income
+df1 <- df1 %>%
+  mutate(Income_Dichotomous = ifelse(rincome %in% c("More than 20000", "More than 20000"), "High Income", "Low Income"))
+
+```
+
+Bivariate Analysis - Differences in Proportions
+================
+```{r}
+# Create a contingency table for race vs. income
+contingency_table <- table(df1$Race_Dichotomous, df1$Income_Dichotomous)
+
+# Calculate proportions
+proportions <- prop.table(contingency_table, margin = 1)
+
+```
+
+
+Hypothesis Testing with Crosstab
+================
+```{r}
+# Perform a chi-squared test for independence
+chi_squared_test <- chisq.test(contingency_table)
+
+# Print the test results
+print(chi_squared_test)
+
+```
+Conclusion
+================
+In this study, we examined the relationship between race and income among a sample of individuals in the year 2010. We created dichotomous variables and graphs for race and income to facilitate our analysis. From the graphs,  it is evident that the ‘White’ race has high income compared to the black.
+Our statistical analysis has revealed a significant association between race and income. The chi-squared test for independence showed a highly significant p-value, indicating that the observed differences in income levels among different racial categories are not due to random chance.
+Upon closer examination of the proportions within each race category, it is evident that 'White' individuals have 'High Income' while 'Non-White' individuals have 'Low Income' highlighting the existence of substantial income disparities among racial groups.
+
+\newpage
+**REFERENCES.**
+=============
+
+-https://www.nber.org/system/files/working_papers/w23733/w23733.pdf 
+
+-https://www.pewresearch.org/short-reads/2014/12/12/racial-wealth-gaps-great-recession/ 
+
+-https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4817358/
+
+-https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5117629/ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newpage
+**APPENDIX A: Code**
+=============
+
+## Preamble
+### Name: Clayton Perrin
+### Date: Oct 9 2023
+### Purpose: Paper 2 (race and reported income)
+library(dplyr)
+library(descr)
+library(forcats)
+library(ggplot2)
+
+## create a table of gss_cat
+table(gss_cat$race)
+table(gss_cat$rincome)
+
+## create data frame & remove missing values
+df1 <- gss_cat %>% 
+  na.omit() %>% 
+  filter(year == 2010) %>% 
+  select(year, race, rincome)
+
+## making variable dichotomous, eliminating categories from data
+df1 %>% 
+  filter(year == 2010) %>% 
+  filter(race != "Other")
+
+df1 %>% 
+  filter(year == 2010) %>% 
+  filter(rincome  != " Don't know" 
+         & rincome != "Refused" 
+         & rincome  != "Not applicable" )
+
+## get a quick count of the sample size
+count(df1)
+
+## get the relative frequency for the race variable
+df1 %>% 
+  filter(year == 2010) %>% 
+  filter(race != "Other") %>% 
+  count(race) %>% 
+  mutate(prop = prop.table(n))
+
+## get relative frquency for the response variable (income)
+df1 %>% 
+  filter(year == 2010) %>% 
+  filter(rincome != "No answer"
+         & rincome != "Refused"
+         & rincome != "Not applicable"
+         & rincome != "Don't Know" ) %>% 
+  mutate(rincome = fct_recode(rincome, 
+                              "More than 20000" = "$25000 or more",
+                              "More than 20000" = "$20000 - 24999",
+                              "Less than 20000" = "$15000 - 19999",
+                              "Less than 20000" = "$10000 - 14999",
+                              "Less than 20000" = "$8000 to 9999",
+                              "Less than 20000" = "$7000 to 7999",
+                              "Less than 20000" = "$6000 to 6999",
+                              "Less than 20000" = "$5000 to 5999",
+                              "Less than 20000" = "$4000 to 4999",
+                              "Less than 20000" = "$3000 to 3999",
+                              "Less than 20000" = "$1000 to 2999",
+                              "Less than 20000" = "Lt $1000"))   %>% 
+  count(rincome) %>% 
+  mutate(prop = prop.table(n))
+
+# Filter and prepare the data for visualization
+data_to_plot <- df1 %>%
+  filter(year == 2010) %>%
+  filter(race != "Other" &
+           rincome != "No answer" &
+           rincome != "Refused" &
+           rincome != "Not applicable" &
+           rincome != "Don't Know")
+
+
+# Create a bar plot for race
+ggplot(df1 %>% 
+         filter(year == 2010) %>% 
+         filter(race != "Other") %>% 
+         count(race) %>% 
+         mutate(prop = prop.table(n)), 
+       aes(x = race, y = prop, fill = race)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Relative Frequency of Race in 2010",
+       x = "Race",
+       y = "Proportion") +
+  theme_minimal()
+
+# Create a grouped bar plot
+ggplot(data_to_plot, aes(x = race, fill = rincome)) +
+  geom_bar(position = "dodge") +
+  labs(title = "Income vs Race in 2010",
+       x = "Race",
+       y = "Count") +
+  scale_fill_brewer(palette = "Set1") +  # Adjust the color palette
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotate x-axis labels for better readability
+
+
+# Create a bar plot for reported income
+ggplot(df1 %>% 
+         filter(year == 2010) %>% 
+         filter(rincome != "No answer" &
+                  rincome != "Refused" &
+                  rincome != "Not applicable" &
+                  rincome != "Don't Know"), 
+       aes(x = rincome, fill = rincome)) +
+  geom_bar() +
+  labs(title = "Relative Frequency of Reported Income in 2010",
+       x = "Reported Income",
+       y = "Count") +
+  theme_minimal()
+
+
+

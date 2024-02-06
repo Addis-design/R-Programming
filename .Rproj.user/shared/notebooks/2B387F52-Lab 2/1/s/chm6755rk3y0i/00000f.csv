@@ -1,0 +1,8 @@
+"0","#Load the libraries"
+"0","library(dplyr)"
+"0","library(descr)"
+"0","library(forcats)"
+"0","library(ggplot2)"
+"0","#view the data"
+"0","?gss_cat"
+"0","gss_cat"

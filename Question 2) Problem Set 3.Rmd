@@ -1,0 +1,145 @@
+---
+title: "Question 2) Problem Set 3"
+author: "Name"
+date: "2023-10-12"
+output: word_document
+---
+###Question 2) Problem Set 3 R Markdown
+```{r}
+#1 Create a vector of random numbers
+my_vec <- runif(100, min = 0, max = 100)
+# Check the structure and summary of my_vec
+str(my_vec)
+summary(my_vec)
+   
+```
+
+```{r}
+##2 Plot a histogram
+hist(my_vec)
+
+#The hist function generates a histogram of the my_vec data. It shows the distribution of #the random numbers in my_vec with bins for different ranges of values
+```
+
+```{r}
+#3 Load the mtcars dataset
+data(mtcars)
+# Check class, structure, and summary of mtcars
+class(mtcars)
+str(mtcars)
+summary(mtcars)
+
+#3What do these three functions tell you about mtcars
+#class tells us that mtcars is a data frame
+#str provides information about the structure of the mtcars data frame, including the names and types of its columns.
+#summary provides summary statistics for each column in the mtcars data frame.
+
+#4Look at the help ﬁle for the class data.frame . What does it tell you about these objects?
+
+?data.frame
+#The help file for the data.frame class in R does not directly mention the class, str, or summary functions, but it provides information that is relevant to understanding how these functions can be applied to data frames.
+```
+
+```{r}
+# 5. Thinking about working with Financial Analysis data for my ﬁnal project
+#Financial Analysis: Consider financial data, such as stock market prices, economic #indicators, or company financial reports, to perform financial modeling, risk analysis, or #investment strategies.
+
+```
+
+
+```{r}
+#First Dynamic Report
+iris
+# 1. Get the column names and data types
+colnames(iris)
+sapply(iris, class)
+```
+
+```{r}
+
+#2 Get the dimensions (rows and columns) of the Iris dataset
+dim(iris)
+```
+
+
+
+
+```{r}
+#4. Create a single vector (a new object) called ‘width’ that is the Sepal. Width column of iris
+# Create a vector 'width' from the 'Sepal.Width' column of the Iris dataset
+width <- iris$Sepal.Width
+width
+```
+
+
+
+```{r}
+
+#5. What is the 100th value in your ‘width’ vector?
+value_100 <- width[100]
+value_100
+```
+
+
+```{r}
+#6. What is the last value in your ‘width’ vector? Can you write code that returns this value even if you don’t know how long ‘width’ is?
+last_value <- tail(width, n = 1)
+last_value
+
+```
+
+```{r}
+#7. Select rows 10 to 20, with all columns in the iris dataset.
+subset_iris <- iris[10:20, ]
+subset_iris
+```
+
+```{r}
+#8. Select rows 10 to 20 with only the Species, Petal. Width and Petal length. Can you do this two different ways?
+#method 1
+subset_1 <- iris[10:20, c("Species", "Petal.Width", "Petal.Length")]
+#method 2
+subset_2 <- iris[10:20, c(5, 4, 3)]
+```
+
+```{r}
+#9. Select rows 1 to 10, 20, and 100 in the iris dataset.
+subset_rows <- iris[c(1:10, 20, 100), ]
+
+```
+
+```{r}
+#10. Select the ﬁrst value in the Sepal. Length column of the iris dataset. Bonus - can you do this three different ways?
+iris[1, "Sepal.Length"]
+iris$Sepal.Length[1]
+head(iris$Sepal.Length, n = 1)
+
+#Selecting the First Value in the Sepal.Length Column (three different ways)
+iris$Sepal.Length[1]
+iris[1, "Sepal.Length"]
+iris[1, ]$Sepal.Length
+```
+
+
+
+
+```{r}
+#11. Without running the following code in R, try to determine which of the following will return the ﬁrst three rows of the Sepal.  Length column in the iris data. frame? For each of the answers that do not work, see if you explain why!
+
+
+iris[c(1, 2, 3), 'Sepal.Length']
+#This option works correctly. It selects the first three rows of the Sepal.Length column by specifying the row indices (1, 2, 3) and the column name ('Sepal.Length').
+
+
+#iris[1, 2, 3, 'Sepal.Length']
+#This option will not work because the syntax is incorrect. You should use a single set of square brackets for subsetting, not multiple sets of square brackets for individual rows or columns.
+
+#iris[(1, 2, 3), 'Sepal.Length']
+#This option will not work because the syntax (1, 2, 3) is not valid for selecting rows. You should use a vector of row indices inside square brackets.
+
+
+#iris['Sepal.Length', c(1, 2, 3)] 
+#This option will not work specific task. It attempts to select the 'Sepal.Length' row and the specified columns (1, 2, 3). To select rows, you should use square brackets for row indices.
+
+```
+

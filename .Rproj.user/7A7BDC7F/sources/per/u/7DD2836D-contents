@@ -1,0 +1,264 @@
+#Question 2
+library(sfcr)
+
+# Remove all existing objects in the workspace
+rm(list=ls())
+
+open_eqs <- sfcr_set(
+  eq1 = Y_CA ~ C_CA + G_CA + X_CA - M_CA,
+  eq2 = Y_US ~ C_US + G_US + X_US - M_US,
+  eq3 = M_CA ~ mu_CA * Y_CA,
+  eq4 = M_US ~ mu_US * Y_US,
+  eq5 = X_CA ~ M_US / xr,
+  eq6 = X_US ~ M_CA * xr,
+  eq7 = YD_CA ~ Y_CA + r_CA[-1] * Bh_CA_CA[-1] + r_US[-1] * Bs_CA_US[-1] / xr - TX_CA,
+  eq8 = YD_US ~ Y_US + r_CA[-1] * Bs_US_CA[-1] * xr + r_US[-1] * Bh_US_US[-1] - TX_US,
+  eq9 = TX_CA ~ theta_CA * ( Y_CA + r_CA[-1] * Bh_CA_CA[-1] + r_US[-1] * Bs_CA_US[-1] / xr ),
+  eq10 = TX_US ~ theta_US * ( Y_US + r_CA[-1] * Bs_US_CA[-1] * xr + r_US[-1] * Bh_US_US[-1] ),
+  eq11 = CG_CA ~ Bs_CA_US[-1] * (1/xr - 1/xr[-1]),
+  eq12 = CG_US ~ Bs_US_CA[-1] * (xr - xr[-1]),
+  eq13 = V_CA ~ V_CA[-1] + ( YD_CA - C_CA ) + CG_CA,
+  eq14 = V_US ~ V_US[-1] + ( YD_US - C_US ) + CG_US,
+  eq15 = C_CA ~ alpha1_CA * YD_CA + alpha2_CA * V_CA[-1],
+  eq16 = C_US ~ alpha1_US * YD_US + alpha2_US * V_US[-1],
+  eq17 = Hh_CA ~ V_CA - Bh_CA_CA - Bh_CA_US,
+  eq18 = Hh_US ~ V_US - Bh_US_CA - Bh_US_US,
+  eq19 = Bh_CA_CA ~ V_CA * ( lambda20_CA + lambda22_CA * r_CA + lambda23_CA * r_US ),
+  eq20 = Bh_CA_US ~ V_CA * ( lambda30_CA + lambda32_CA * r_CA + lambda33_CA * r_US ),
+  eq21 = Bh_US_CA ~ V_US * ( lambda20_US + lambda22_US * r_CA + lambda23_US * r_US ),
+  eq22 = Bh_US_US ~ V_US * ( lambda30_US + lambda32_US * r_CA + lambda33_US * r_US ),
+  eq23 = Bs_CA ~ Bs_CA[-1] + ( G_CA + r_CA[-1] * Bs_CA[-1] ) - ( TX_CA + r_CA[-1] * Bcb_CA[-1] ),
+  eq24 = Bs_US ~ Bs_US[-1] + ( G_US + r_US[-1] * Bs_US[-1] ) - ( TX_US + r_US[-1] * Bcb_US[-1] ),
+  eq25 = Bs_CA_US ~ Bh_CA_US * xr,
+  eq26 = Bs_US_CA ~ Bh_US_CA / xr,
+  eq27 = Bcb_CA ~ Bs_CA - Bh_CA_CA - Bs_US_CA,
+  eq28 = Bcb_US ~ Bs_US - Bs_CA_US - Bh_US_US,
+  eq29 = or_CA ~ or_CA[-1] + ( Hs_CA - Hs_CA[-1] - ( Bcb_CA - Bcb_CA[-1] ) )/pg_CA,
+  eq30 = or_US ~ or_US[-1] + ( Hs_US - Hs_US[-1] - ( Bcb_US - Bcb_US[-1] ) )/pg_US,
+  eq31 = Hs_CA ~ Hh_CA,
+  eq32 = Hs_US ~ Hh_US,
+  eq33 = xr ~ pg_US / pg_CA,
+  eq34 = deltaor_US ~ or_US - or_US[-1],
+  eq35 = deltaor_CA ~ or_CA - or_CA[-1],
+  eq36 = CAB_CA ~ X_CA - M_CA + r_US[-1] * Bs_CA_US[-1] * xr - r_CA[-1] * Bs_US_CA[-1],
+  eq37 = CAB_US ~ X_US - M_US - r_US[-1] * Bs_CA_US[-1] + r_CA[-1] * Bs_US_CA[-1] / xr,
+  eq38 = FAB_CA ~ -(deltaor_CA*pg_CA + (Bs_CA_US - Bs_CA_US[-1])*xr - (Bs_US_CA - Bs_US_CA[-1])),
+  eq39 = FAB_US ~ -(deltaor_US*pg_US + (Bs_US_CA - Bh_US_CA[-1])/xr - (Bs_CA_US - Bh_CA_US[-1])),
+  eq40 = BOP_CA ~ CAB_CA + FAB_CA,
+  eq41 = BOP_US ~ CAB_US + FAB_US,
+  eq42 = GDEF_CA ~ -(Bs_CA - Bs_CA[-1]),
+  eq43 = GDEF_US ~ -(Bs_US - Bs_US[-1]),
+  eq44 = redondant ~ deltaor_US + deltaor_CA
+)
+open_ext <- sfcr_set(
+  pg_CA ~ 1.0,
+  pg_US ~ 1.0,
+  r_CA ~ 0.04,
+  r_US ~ 0.04,
+  orbar_CA ~ 100,
+  orbar_US ~ 100,
+  G_US ~ 50,
+  G_CA ~ 50,
+  mu_CA ~ 0.15,
+  mu_US ~ 0.15,
+  alpha1_CA ~ 0.8,
+  alpha1_US ~ 0.8,
+  alpha2_CA ~ 0.2,
+  alpha2_US ~ 0.2,
+  lambda20_CA ~ 0.55,
+  lambda30_CA ~ 0.25,
+  lambda20_US ~ 0.25,
+  lambda30_US ~ 0.55,
+  lambda22_CA ~ 5,
+  lambda23_CA ~ -3,
+  lambda32_CA ~ -3,
+  lambda33_CA ~ 5,
+  lambda22_US ~ 5,
+  lambda23_US ~ -3,
+  lambda32_US ~ -3,
+  lambda33_US ~ 5,
+  theta_CA ~ 0.2,
+  theta_US ~ 0.2,
+)
+open_initial <- sfcr_set(
+  xr ~ 1,
+  or_CA ~ 100,
+  or_US ~ 100
+)
+# Simulate the model for 200 periods
+model <- sfcr_baseline(
+  equations = open_eqs,
+  external = open_ext,
+  initial = open_initial,
+  periods = 200,
+  method = "Broyden"
+)
+# a) Determine the exchange rate direction
+steady_state_xr <- tail(model$xr, 1)
+if (steady_state_xr > 1) {
+  cat("Exchange rate quoted as the number of US dollars needed to buy 1 Canadian dollar.\n")
+} else {
+  cat("Exchange rate quoted as the number of Canadian dollars needed to buy 1 US dollar.\n")
+}
+#a) Exchange Rate Direction
+#Based on the model definition, xr represents the number of US dollars needed to buy 1 Canadian dollar.
+#b) Explanation of Parameters lambda20_CA, lambda30_CA, lambda20_US, and lambda30_US
+#These parameters represent the coefficients associated with the impact of the real interest rate on the demand for government bills.
+
+
+
+# Steady-state values
+lambda20_CA <- 0.55
+lambda30_CA <- 0.25
+lambda20_US <- 0.25
+lambda30_US <- 0.55
+
+#c) Intuition behind Calibration of lambda20_CA and lambda30_CA
+#The fact that lambda20_CA is greater than lambda30_CA indicates the direct impact of Canada's real interest rate on Canadian government bills is stronger than the indirect effect through exchange rates. If we assume that households are more sensitive to fluctuations in the domestic real interest rate, this calibration is reasonable.
+
+#In the same vein, lambda30_US >lambda20 is indicative of a greater indirect effect via the exchange rate than on US government bills in response to higher real interest rates. This calibration is reasonable to assume that households are more sensitive than governments when it comes to changes in the exchange rate.
+if (lambda20_CA > lambda30_CA && lambda30_US >lambda20_US) {
+  cat("The calibration seems reasonable.\n")
+} else {
+  cat("The calibration may need further consideration.\n")
+}
+
+#d) Share of Wealth for Canadian Households at Steady State
+
+V_CA_steady <- 100  # Assuming a steady-state value for V_CA
+Bh_CA_CA_steady <- V_CA_steady * (lambda20_CA)
+Bh_CA_US_steady <- V_CA_steady * (lambda30_CA)
+
+Hh_CA_steady <- V_CA_steady * (1 - lambda20_CA - lambda30_CA)
+
+# Calculate shares
+share_Bh_CA_CA <- Bh_CA_CA_steady / V_CA_steady
+share_Bh_CA_US <- Bh_CA_US_steady / V_CA_steady
+share_Hh_CA <- Hh_CA_steady / V_CA_steady
+
+# Print shares
+cat("Share of wealth in Canadian government bills (Bh_CA_CA):", share_Bh_CA_CA, "\n")
+cat("Share of wealth in US government bills (Bh_CA_US):", share_Bh_CA_US, "\n")
+cat("Share of wealth in money (Hh_CA):", share_Hh_CA, "\n")
+
+#e) Share of Wealth for US Households at Steady State
+# Steady-state values
+lambda20_US <- 0.25
+lambda30_US <- 0.55
+
+V_US_steady <- 100  # Assuming a steady-state value for V_US
+Bh_US_CA_steady <- V_US_steady * (lambda20_US)
+Bh_US_US_steady <- V_US_steady * (lambda30_US)
+
+Hh_US_steady <- V_US_steady * (1 - lambda20_US - lambda30_US)
+
+# Calculate shares
+share_Bh_US_CA <- Bh_US_CA_steady / V_US_steady
+share_Bh_US_US <- Bh_US_US_steady / V_US_steady
+share_Hh_US <- Hh_US_steady / V_US_steady
+
+# Print shares
+cat("Share of wealth in Canadian government bills (Bh_US_CA):", share_Bh_US_CA, "\n")
+cat("Share of wealth in US government bills (Bh_US_US):", share_Bh_US_US, "\n")
+cat("Share of wealth in money (Hh_US):", share_Hh_US, "\n")
+
+# e) Share of Wealth for US Households at Steady State with Policy Interest Rate Shock
+shock_params <- list(r_US = list(value = 0.05))
+
+# Simulate the shock over multiple periods
+for (i in 3:100) {
+  shock_model <- sfcr_shock(model, shocks = shock_params, start = i, nperiods = 1)
+}
+
+ 
+# Calculate shares at the steady state after the shock
+share_Bh_US_CA_shock <- tail(shock_model$Bh_US_CA, 1) / tail(shock_model$V_US, 1)
+share_Bh_US_US_shock <- tail(shock_model$Bh_US_US, 1) / tail(shock_model$V_US, 1)
+share_Hh_US_shock <- tail(shock_model$Hh_US, 1) / tail(shock_model$V_US, 1)
+
+# Print shares after the shock
+cat("Share of wealth in Canadian government bills (Bh_US_CA) after shock:", share_Bh_US_CA_shock, "\n")
+cat("Share of wealth in US government bills (Bh_US_US) after shock:", share_Bh_US_US_shock, "\n")
+cat("Share of wealth in money (Hh_US) after shock:", share_Hh_US_shock, "\n")
+
+# f) Plot the response of Canada and US consumption to the shock
+par(mfrow = c(1, 1))
+plot(1:100, (shock_model$C_CA - tail(model$C_CA, 1)) / tail(model$C_CA, 1) * 100, type = "l", col = "blue", xlab = "Periods", ylab = "Consumption Deviation (%)", main = "Response to Policy Interest Rate Shock")
+lines(1:100, (shock_model$C_US - tail(model$C_US, 1)) / tail(model$C_US, 1) * 100, col = "red")
+legend("topright", legend = c("Canada", "US"), col = c("blue", "red"), lty = 1)
+
+# g) Plot Bh_CA_CA and Bh_CA_US, Bh_US_CA and Bh_US_US on the same graph
+par(mfrow = c(1, 1))
+plot(1:200, shock_model$Bh_CA_CA, type = "l", col = "red", xlab = "Periods", ylab = "Bills", main = "Government Bills Response")
+lines(1:200, shock_model$Bh_CA_US, col = "blue")
+legend("topright", legend = c("Bh_CA_CA", "Bh_CA_US"), col = c("red", "blue"), lty = 1)
+
+# Plot Bh_US_CA and Bh_US_US on another graph
+par(mfrow = c(1, 1))
+plot(1:200, shock_model$Bh_US_CA, type = "l", col = "green", xlab = "Periods", ylab = "Bills", main = "Government Bills Response")
+lines(1:200, shock_model$Bh_US_US, col = "purple")
+legend("topright", legend = c("Bh_US_CA", "Bh_US_US"), col = c("green", "purple"), lty = 1)
+
+# h) Alternative Calibration
+open_ext_alternative <- sfcr_set(
+  lambda20_CA ~ 0.4,
+  lambda30_CA ~ 0.4,
+  lambda20_US ~ 0.4,
+  lambda30_US ~ 0.4
+)
+
+# Simulate the model with alternative calibration for 200 periods
+model_alternative <- sfcr_baseline(
+  equations = open_eqs,
+  external = open_ext_alternative,
+  initial = open_initial,
+  periods = 200,
+  method = "Broyden"
+)
+
+# Steady-state values after alternative calibration
+V_CA_steady_alternative <- 100
+Bh_CA_CA_steady_alternative <- V_CA_steady_alternative * 0.4
+Bh_CA_US_steady_alternative <- V_CA_steady_alternative * 0.4
+Hh_CA_steady_alternative <- V_CA_steady_alternative * 0.2
+
+V_US_steady_alternative <- 100
+Bh_US_CA_steady_alternative <- V_US_steady_alternative * 0.4
+Bh_US_US_steady_alternative <- V_US_steady_alternative * 0.4
+Hh_US_steady_alternative <- V_US_steady_alternative * 0.2
+
+# Calculate shares after the shock
+share_Bh_CA_CA_alternative <- Bh_CA_CA_steady_alternative / V_CA_steady_alternative
+share_Bh_CA_US_alternative <- Bh_CA_US_steady_alternative / V_CA_steady_alternative
+share_Hh_CA_alternative <- Hh_CA_steady_alternative / V_CA_steady_alternative
+
+share_Bh_US_CA_alternative <- Bh_US_CA_steady_alternative / V_US_steady_alternative
+share_Bh_US_US_alternative <- Bh_US_US_steady_alternative / V_US_steady_alternative
+share_Hh_US_alternative <- Hh_US_steady_alternative / V_US_steady_alternative
+
+# Print shares after alternative calibration
+cat("\nShares after alternative calibration:\n")
+cat("Share of wealth in Canadian government bills (Bh_CA_CA):", share_Bh_CA_CA_alternative, "\n")
+cat("Share of wealth in US government bills (Bh_CA_US):", share_Bh_CA_US_alternative, "\n")
+cat("Share of wealth in money (Hh_CA):", share_Hh_CA_alternative, "\n")
+
+cat("Share of wealth in Canadian government bills (Bh_US_CA):", share_Bh_US_CA_alternative, "\n")
+cat("Share of wealth in US government bills (Bh_US_US):", share_Bh_US_US_alternative, "\n")
+cat("Share of wealth in money (Hh_US):", share_Hh_US_alternative, "\n")
+
+# i) Y_CA and Y_US at the steady state of the alternative model
+Y_CA_steady_alternative <- tail(model_alternative$Y_CA, 1)
+Y_US_steady_alternative <- tail(model_alternative$Y_US, 1)
+
+# Print Y_CA and Y_US at the steady state of the alternative model
+cat("\nY_CA at the steady state of the alternative model:", Y_CA_steady_alternative, "\n")
+cat("Y_US at the steady state of the alternative model:", Y_US_steady_alternative, "\n")
+
+# Simulate the shocks again with the alternative model
+shock_model_alternative <- sfcr_shock(model_alternative, "r_US", start = 3, end = 100, value = 0.05)
+
+# i) Plot the response of Canada's consumption for both models
+par(mfrow = c(1, 1))
+plot(1:100, (shock_model$C_CA - tail(model$C_CA, 1)) / tail(model$C_CA, 1) * 100, type = "l", col = "blue", xlab = "Periods", ylab = "Consumption Deviation (%)", main = "Response to Policy Interest Rate Shock - Initial Model")
+lines(1:100, (shock_model_alternative$C_CA - tail(model_alternative$C_CA, 1)) / tail(model_alternative$C_CA, 1) * 100, col = "red")
+legend("topright", legend = c("Initial Model", "Alternative Model"), col = c("blue", "red"), lty = 1)

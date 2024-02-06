@@ -1,0 +1,337 @@
+---
+title: "Practice Work"
+output: pdf_document
+date: "2023-11-20"
+---
+#Question one
+======
+#Estimating the relationship between age and earnings.
+======
+```{r}
+
+#1 a
+# Coefficients from the regression
+intercept <- -344.88
+coef_age <- 41.48
+coef_age2 <- -0.45
+coef_female <- -163.81
+
+# Age values
+age_30 <- 30
+age_40 <- 40
+
+# Predicted earnings for someone who is 30
+earnings_30 <- intercept + coef_age * age_30 + coef_age2 * age_30^2 + coef_female
+
+# Predicted earnings for someone who is 40
+earnings_40 <- intercept + coef_age * age_40 + coef_age2 * age_40^2 + coef_female
+
+# Calculate the effect on earnings from getting a year older for someone who is 30 and 40
+effect_30_40 <- earnings_40 - earnings_30
+
+# The results
+cat("Predicted earnings for someone who is 30:", earnings_30, "\n")
+cat("Predicted earnings for someone who is 40:", earnings_40, "\n")
+cat("Effect on earnings from getting a year older for someone who is 30 vs 40:", effect_30_40, "\n")
+#The predicted effect for someone who is 40 is bigger than the predicted effect for someone who is 30.
+```
+
+```{r}
+
+#1 b
+# Coefficients and standard errors for each specification
+coefficients_top <- c(Intercept = -795.90, Age = 82.93, Age2 = -1.69, Age3 = 0.015, Age4 = -0.0005, Female = -163.19)
+se_top <- c(283.11, 29.29, 1.06, 0.016, 0.0009, 12.45)
+
+coefficients_middle <- c(Intercept = -683.21, Age = 65.83, Age2 = -1.05, Age3 = 0.005, Female = -163.23)
+se_middle <- c(120.13, 9.27, 0.22, 0.002, 12.45)
+
+coefficients_bottom <- c(Intercept = -344.88, Age = 41.48, Age2 = -0.45, Female = -163.81)
+se_bottom <- c(51.58, 2.64, 0.03, 12.47)
+
+# Calculate t-values for each coefficient
+t_values_top <- coefficients_top / se_top
+t_values_middle <- coefficients_middle / se_middle
+t_values_bottom <- coefficients_bottom / se_bottom
+
+# Calculate two-sided p-values for each coefficient
+p_values_top <- 2 * pt(abs(t_values_top), df = length(se_top) - 1, lower.tail = FALSE)
+p_values_middle <- 2 * pt(abs(t_values_middle), df = length(se_middle) - 1, lower.tail = FALSE)
+p_values_bottom <- 2 * pt(abs(t_values_bottom), df = length(se_bottom) - 1, lower.tail = FALSE)
+
+# Count the number of significant coefficients at the 5% level
+significant_top <- sum(p_values_top < 0.05)
+significant_middle <- sum(p_values_middle < 0.05)
+significant_bottom <- sum(p_values_bottom < 0.05)
+
+# Print the results
+cat("Number of significant coefficients in Top Specification:", significant_top, "\n")
+cat("Number of significant coefficients in Middle Specification:", significant_middle, "\n")
+cat("Number of significant coefficients in Bottom Specification:", significant_bottom, "\n")
+
+#The Bottom Specification is more significant coefficients compared to the other Coefficients
+```
+#Question 2
+=====
+#
+```{r}
+#2 a
+#Fatalities=123.98+0.091×CellPlans
+#In this regression model:
+ # • Intercept (123.98) represents the estimated number of fatalities when the number of cell   plans (CellPlans) is zero. 
+#• Coefficient on CellPlans (0.091) is the estimated change in the number of fatalities for a one-unit increase in the number of cell phone plans. It suggests that, on average, for each additional cell phone plan, there is an expected increase of 0.091 in the number of fatalities.Fatalities=−3557.08+515.81×ln(CellPlans)
+
+```
+
+#
+
+```{r}
+#2 b)
+#
+#In this regression model:
+ # • Intercept (-3557.08) Similar to the intercept in the previous model, represents the estimated number of fatalities when the natural logarithm of the number of cell phone plans (ln(CellPlans)) is zero.  
+#• Coefficient on ln(CellPlans) (515.81) is the estimated change in the number of fatalities for a one-unit increase in the natural logarithm of the number of cell phone plans. The natural logarithm transformation is often used to address issues of scale, and in this context, the coefficient represents the percentage change in fatalities associated with a 1% increase in the number of cell phone plans.
+
+#
+
+```
+
+
+```{r}
+#2 c) ln(Fatalities)=5.43+0.0001×CellPlans
+#In this regression model:
+#  • Intercept (5.43) refers to what is considered as a natural logarithm of fatalities where CellPlans equals 0. 
+#• Coefficient on CellPlans (0.0001): The estimated change in death’s natural logarithm for each additional plan.This means that every unit increase of cell phones plans is likely to add such a minimal rise in the fatalities.
+
+```
+
+```{r}
+#2 d) ln(Fatalities)=−0.89+0.85×ln(CellPlans)
+#In this regression model:
+#  • Intercept (-0.89): It similarly mirrors the intercept of the last model reflecting the predicted natural logarithm of deaths when the natural logarithm of number of cellplans (ln(Cellplans)) equals to zero.
+#• Coefficient on ln(CellPlans) (0.85): Depicts the predicted number of deaths per unit shift in the ln fatalities for a rise in the ln number of mobile subscriptions. The coefficient signifies the rate of increase in fatalities due to one percent increase in the number of phone plans.
+```
+#Question 3
+=====
+
+```{r}
+#3a
+# Original coefficients
+intercept_original <- 2.431
+coef_ppg_original <- 0.742
+
+# Convert salary to thousands of dollars
+intercept_thousands <- intercept_original * 1000
+coef_ppg_thousands <- coef_ppg_original * 1000
+
+# Display the coefficient on PPG
+cat("Coefficient on PPG (in thousands of dollars):", coef_ppg_thousands, "\n")
+
+```
+#Question 4
+=====
+
+```{r}
+
+#4 a
+# Number of firms and time periods
+num_firms <- 45
+num_time_periods <- 10
+
+# Total number of coefficients
+total_coefficients <- 1 + 1 + num_firms + num_time_periods
+
+# Display the result
+cat("Total number of coefficients to be estimated:", total_coefficients, "\n")
+
+```
+
+
+
+```{r}
+#4 b
+# Number of teams and seasons
+num_teams <- 30
+num_seasons <- 4
+
+# Total number of coefficients
+total_coefficients <- 1 + 1 + num_teams + num_seasons
+
+# Display the result
+cat("Total number of coefficients to be estimated:", total_coefficients, "\n")
+
+```
+#Question 5
+====
+```{r}
+#5 a
+# Coefficients
+intercept <- 7.49
+coef_educ <- 3.02
+coef_pareduc <- 0.28
+coef_interact <- -0.036
+
+# Values
+educ <- 16
+pareduc <- 20
+
+# Calculate predicted wage
+predicted_wage <- intercept + coef_educ * educ + coef_pareduc * pareduc + coef_interact * educ * pareduc
+
+# Display the result
+cat("Predicted Wage:", predicted_wage, "\n")
+```
+
+
+```{r}
+#5b
+# Coefficients
+coef_educ <- 3.02
+
+# Expected increase in wages from an additional year of school
+increase_in_wages <- coef_educ
+
+# Display the result
+cat("Expected Increase in Wages from an Additional Year of School:", increase_in_wages, "dollars\n")
+
+```
+
+
+
+```{r}
+#5 C
+#Coefficient for the product of the interaction term educ × pareduc
+#educ × pareduc shows a negative value of -0.036 in the regression model. The interaction term includes the influence that own education (educ) and parental education (pareduc) exert upon workers’ earnings simultaneously. Negative sign of the coefficient represents the fact that in the present study, the rate of profitability for education lowers when parents’ education level becomes high. This means that the effect of another year added in educational process is lower if parents’ education is higher. Therefore it means there is a negative cross-effect whereby the earnings from education depend on parent’s education
+
+```
+
+
+
+```{r}
+#5 d
+# Coefficient for the interaction term educ*pareduc
+coef_interact <- -0.036
+
+# Standard error for the interaction term
+se_interact <- 0.021
+
+# Degrees of freedom (n - number of coefficients)
+df <- 722 - 4
+
+# Calculate t-statistic
+t_stat <- coef_interact / se_interact
+
+# Calculate two-sided p-value
+p_value <- 2 * pt(abs(t_stat), df = df, lower.tail = FALSE)
+
+# Display the results
+cat("t-statistic:", t_stat, "\n")
+cat("p-value:", p_value, "\n")
+
+# Test at 5% significance level
+if (p_value < 0.05) {
+  cat("Reject the null hypothesis. There is evidence that the return to education depends on parents' education.\n")
+} else {
+  cat("Fail to reject the null hypothesis. There is no evidence that the return to education depends on parents' education.\n")
+}
+
+
+```
+
+
+#Question 6
+=====
+
+```{r}
+
+#6 a
+# Given coefficients
+coef_cons <- 3.037
+coef_2019 <- -0.039
+
+# Calculate estimated intercept for a freshman in 2019
+estimated_intercept_freshman_2019 <- coef_cons + coef_2019
+
+# Display the result
+cat("Estimated Intercept for a Freshman in 2019 is :", estimated_intercept_freshman_2019, "\n")
+
+
+
+```
+
+
+
+
+
+```{r}
+#6 b
+# Given coefficients
+coef_cons <- 3.037
+coef_soph <- 0.034
+coef_2020 <- -0.144
+
+# Calculate estimated slope coefficient for a sophomore in 2020
+estimated_slope_sophomore_2020 <- coef_cons + coef_soph + coef_2020
+
+# Display the result
+cat("Estimated Slope Coefficient for a Sophomore in 2020:", estimated_slope_sophomore_2020, "\n")
+
+```
+
+#Question 7 using dataset rental.xlsx provided
+=====
+
+```{r}
+#7 a
+library(readxl)
+
+rental <- read_excel("Desktop/Projects/R/rental.xlsx")
+ View(rental) 
+ # Fit the regression model
+ model <- lm(log(rent) ~ log(pop) + log(avginc) + pctstu, data = rental)
+ 
+ # Display the regression results
+ summary(model)
+
+```
+
+
+
+
+```{r}
+#7 b
+ # Add a dummy variable for the year
+ rental$year_dummy <- as.factor(rental$year)
+ 
+ # Fit the regression model with the dummy variable
+ model_b <- lm(log(rent) ~ log(pop) + log(avginc) + pctstu + year_dummy, data = rental)
+ 
+ # Display the regression results
+ summary(model_b)
+```
+
+```{r}
+#7 c
+ # Extract the intercept for the year 2010
+ intercept_2010 <- coef(model_b)['year_dummy2010']
+ 
+ # Display the result
+ cat("Regression Intercept for the Year 2010:", intercept_2010, "\n")
+```
+
+
+
+
+```{r}
+#7 d 
+ library(plm)
+ # Transform 'city' to a factor variable
+ rental$city <- as.factor(rental$city)
+ 
+ # Estimate fixed effects model
+ model_fe <- plm(log(rent) ~ log(pop) + log(avginc) + pctstu + year_dummy, data = rental, index = c("city", "year"), model = "within")
+ 
+ # Display the regression results
+ summary(model_fe)
+ 
+```

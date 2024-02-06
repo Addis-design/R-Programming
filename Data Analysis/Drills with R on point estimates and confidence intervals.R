@@ -1,0 +1,72 @@
+#Drills with R on point estimates and confidence intervals
+#load libraries
+library(ggplot2)
+#1). The Chicago data file.
+
+# a) 
+# Load Chicago data
+chicago_data <- read.table("Chicago.dat.txt", header = TRUE)
+chicago_data
+# a. Descriptive graphic and point estimates
+# Create a histogram to visualize the distribution
+ggplot(chicago_data, aes(x = income)) +
+  geom_histogram(binwidth = 5, fill = "skyblue", color = "black", alpha = 0.7) +
+  labs(title = "Distribution of Annual Income",
+       x = "Annual Income (in thousands of dollars)",
+       y = "household")
+
+# Calculate point estimates
+mean_income <- mean(chicago_data$income)
+sd_income <- sd(chicago_data$income)
+
+# Interpretation
+cat("Point Estimate of Population Mean:", mean_income, "thousands of dollars\n")
+cat("Point Estimate of Population Standard Deviation:", sd_income, "thousands of dollars\n")
+
+# b. Construct a 95% confidence interval for population mean
+conf_interval <- t.test(chicago_data$income, conf.level = 0.95)$conf.int
+cat("95% Confidence Interval for Population Mean:", conf_interval, "thousands of dollars\n")
+
+#2) the Anorexia data
+
+#Load Anorexia data
+anorexia_data <- read.table("Anorexia_data.txt", header = TRUE)
+
+#a) Subset data for family therapy
+family_therapy_data <- subset(anorexia_data, therapy == "f")
+
+# a. Descriptive statistical analysis using graphs and numerical summaries
+# Create a boxplot for Weight Changes
+boxplot(family_therapy_data$before - family_therapy_data$after, 
+        main = "Weight Changes (Family Therapy)", 
+        ylab = "Weight Change", 
+        col = "skyblue")
+# Create a histogram for Weight Changes
+ggplot(family_therapy_data, aes(x = before - after)) +
+  geom_histogram(binwidth = 5, fill = "skyblue", color = "black", alpha = 0.7) +
+  labs(title = "Histogram of Weight Changes (Family Therapy)",
+       x = "Weight Change",
+       y = "Frequency")
+
+# Create a Q-Q plot for Weight Changes
+qqnorm(family_therapy_data$before - family_therapy_data$after)
+qqline(family_therapy_data$before - family_therapy_data$after, col = 2)
+
+# Calculate numerical summaries
+mean_weight_change <- mean(family_therapy_data$before - family_therapy_data$after)
+sd_weight_change <- sd(family_therapy_data$before - family_therapy_data$after)
+
+cat("Mean Weight Change:", mean_weight_change, "\n")
+cat("Standard Deviation of Weight Change:", sd_weight_change, "\n")
+
+# b. Construct a 95% confidence interval for the difference between population mean weight changes for family therapy and control
+# Subset data for control group
+control_data <- subset(anorexia_data, therapy == "c")
+
+# Use t.test to calculate the confidence interval
+conf_interval_diff <- t.test(family_therapy_data$before - family_therapy_data$after, 
+                             control_data$before - control_data$after, 
+                             conf.level = 0.95)$conf.int
+
+cat("95% Confidence Interval for the Difference in Population Mean Weight Changes:", conf_interval_diff, "\n")
+

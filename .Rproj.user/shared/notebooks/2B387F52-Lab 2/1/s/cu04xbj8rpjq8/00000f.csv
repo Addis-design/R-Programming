@@ -1,0 +1,5 @@
+"0","# Select the two columns"
+"0","gss_subset <- gss_cat %>% select(marital, rincome)"
+"0","# Remove rows with missing values"
+"0","gss_subset <- na.omit(gss_subset)"
+"0","gss_subset"
